@@ -125,7 +125,29 @@ public class MyFunctions {
 
     public static Predicate<File> isFileAndReadable = file-> file.exists() && file.isFile() && !file.isDirectory() && file.canRead();
 
-    public static BiFunction<DirectoryStream<Path>,Predicate,List<File>> convertStreamToList = (stream,predicate)->{
+    public static Function<DirectoryStream<Path>,Function<Predicate,List<File>>> convertStreamToList = stream->predicate->{
+        List<File> pactFiles = null;
+
+        Iterator<Path> streamIterator = stream.iterator();
+
+        while(streamIterator.hasNext()){
+            Path path = streamIterator.next();
+
+            if(predicate.test(path.toFile())){
+                if(pactFiles==null){
+                    pactFiles = new ArrayList();
+                }
+                pactFiles.add(path.toFile());
+            }else{
+                System.out.println(path.toFile().getPath() +"is not a file or not accessible");
+            }
+
+        }
+
+        return pactFiles;
+    };
+
+    /*public static BiFunction<DirectoryStream<Path>,Predicate,List<File>> convertStreamToList = (stream,predicate)->{
         List<File> pactFiles = null;
 
         Iterator<Path> streamIterator = stream.iterator();
@@ -148,9 +170,23 @@ public class MyFunctions {
 
 
 
+    };*/
+
+    public static Function<File,Function<Predicate<File>,List<File>>> getPactFiles = pactFolder->predicate->{
+        List<File> pactFiles = null;
+        if(predicate.test(pactFolder)){
+
+            try {
+                pactFiles = convertStreamToList.apply(Files.newDirectoryStream(pactFolder.toPath(),path -> path.toString().endsWith(".json"))).apply(isFileAndReadable);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return pactFiles;
     };
 
-    public static BiFunction<File,Predicate<File>,List<File>> getPactFiles = (pactFolder,predicate)->{
+    /*public static BiFunction<File,Predicate<File>,List<File>> getPactFiles = (pactFolder,predicate)->{
         List<File> pactFiles = null;
         if(predicate.test(pactFolder)){
 
@@ -162,7 +198,7 @@ public class MyFunctions {
 
         }
         return pactFiles;
-    };
+    };*/
 
     public static Function<File,InteractionDTO> parsePact = file->{
 
@@ -171,7 +207,11 @@ public class MyFunctions {
 
     };
 
-    public static BiFunction<List<File>,Predicate<File>,List<InteractionDTO>> getInteractions = (files,predicate)->{
+    /*public static BiFunction<List<File>,Predicate<File>,List<InteractionDTO>> getInteractions = (files,predicate)->{
+        return files.stream().filter(predicate).map(parsePact).collect(Collectors.toList());
+    };*/
+
+    public static Function<List<File>,Function<Predicate<File>,List<InteractionDTO>>> getInteractions = files->predicate->{
         return files.stream().filter(predicate).map(parsePact).collect(Collectors.toList());
     };
 

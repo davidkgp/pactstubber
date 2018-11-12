@@ -1,0 +1,44 @@
+{
+  "provider": {
+    "name": "myStudentService1"
+  },
+  "consumer": {
+    "name": "mymatching2"
+  },
+  "interactions": [
+    {
+      "description": "student interaction without query details",
+      "request": {
+        "method": "GET",
+        "path": "/myapi/student/18",
+        "headers": {
+          "Content-Type": "application/json",
+          "charset": "UTF-8"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "firstName": "Mickey",
+          "lastName": "Mouse",
+          "address": {
+            "addressLine1": "Marne",
+            "addressLine2": "Rigi"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pact-specification": {
+      "version": "3.0.0"
+    },
+    "pact-jvm": {
+      "version": "3.5.17"
+    }
+  },
+  "createdAt": "2018-08-20T16:21:54+02:00"
+}

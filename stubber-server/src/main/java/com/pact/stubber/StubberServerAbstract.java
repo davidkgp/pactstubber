@@ -80,12 +80,32 @@ public abstract class StubberServerAbstract implements IServer {
 
     }
 
-    @Override
+    /*@Override
     public void loadPacts() throws StubberServerException{
 
         List<InteractionDTO> listInteractions = MyFunctions.getInteractions.apply(MyFunctions.getPactFiles.apply(MyFunctions.getFolder.apply(getServerConfig().getPactFolderPath()),
                 MyFunctions.isDirAndReadable),MyFunctions.isFileAndReadable);
 
+    }*/
+
+    @Override
+    public void loadPacts() throws StubberServerException {
+        List<InteractionDTO> listInteractions = MyFunctions.getInteractions
+                .apply(MyFunctions.getPactFiles
+                .apply(MyFunctions.getFolder.apply
+                        (getServerConfig().getPactFolderPath()))
+                .apply(MyFunctions.isFileAndReadable))
+                .apply(MyFunctions.isFileAndReadable);
+    }
+
+    //@Override
+    public List<InteractionDTO> loadPacts(String folder) throws StubberServerException {
+        return MyFunctions.getInteractions
+                .apply(MyFunctions.getPactFiles
+                        .apply(MyFunctions.getFolder.apply
+                                (folder))
+                        .apply(MyFunctions.isDirAndReadable))
+                .apply(MyFunctions.isFileAndReadable);
     }
 
     public abstract SSLData getSSLData();
