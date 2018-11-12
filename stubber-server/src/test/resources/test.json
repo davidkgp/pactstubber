@@ -1,0 +1,103 @@
+{
+  "provider": {
+    "name": "mystudentservice"
+  },
+  "consumer": {
+    "name": "mymatching"
+  },
+  "interactions": [
+    {
+      "description": "student interaction without query",
+      "request": {
+        "method": "GET",
+        "path": "/myapi/student/15",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "charset": "UTF-8"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "firstName": "Mickey",
+          "lastName": "Mouse",
+          "address": {
+            "addressLine1": "Marne",
+            "addressLine2": "Rigi"
+          },
+          "bestFriends": [
+            {
+              "address": {
+                "addressLine1": "LA",
+                "addressLine2": "Hollywood"
+              },
+              "firstName": "Scooby",
+              "lastName": "Dooby"
+            },
+            {
+              "address": {
+                "addressLine1": "LA",
+                "addressLine2": "Hollywood"
+              },
+              "firstName": "Scrooge",
+              "lastName": "McDuck"
+            },
+            {
+              "address": {
+                "addressLine1": "LA",
+                "addressLine2": "Hollywood"
+              },
+              "firstName": "Daphne",
+              "lastName": "Helga"
+            }
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.address.addressLine1": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.address.addressLine2": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^[a-zA-Z]+$"
+                }
+              ],
+              "combine": "AND"
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^[A-Za-z0-9/;=-]+$"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pact-specification": {
+      "version": "3.0.0"
+    },
+    "pact-jvm": {
+      "version": "3.5.17"
+    }
+  },
+  "createdAt": "2018-08-20T16:21:54+02:00"
+}

@@ -99,6 +99,21 @@ public class MyFunctionsTest {
 
     }
 
+    /*@Test
+    public void testRequestBody(){
+        JSONObject json = new JSONObject("{\"request\": {\n" +
+                "        \"method\": \"GET\",\n" +
+                "        \"path\": \"/data/name\"\n" +
+                "      }}");
+        JSONObject actual = new JSONObject("{\"request\": {\n" +
+                "        \"method\": \"GET\",\n" +
+                "        \"path\": \"/data/name\"\n" +
+                "      }}");
+
+        Assert.assertEquals(json,actual);
+
+    }*/
+
     @Test
     public void testFinalTest(){
         PactParse pactParse = new PactParse();
