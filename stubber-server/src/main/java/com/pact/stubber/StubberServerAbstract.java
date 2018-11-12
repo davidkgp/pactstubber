@@ -1,5 +1,6 @@
 package com.pact.stubber;
 
+import com.pact.parse.dto.InteractionDTO;
 import com.pact.stubber.config.SSLData;
 import com.pact.stubber.config.ServerConfig;
 import com.pact.stubber.exceptions.StubberServerException;
@@ -16,11 +17,14 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import static com.pact.stubber.MyFunctions.getPactFiles;
 
 public abstract class StubberServerAbstract implements IServer {
 
@@ -73,6 +77,14 @@ public abstract class StubberServerAbstract implements IServer {
             throw new StubberServerException(e.getMessage());
         }
 
+
+    }
+
+    @Override
+    public void loadPacts() throws StubberServerException{
+
+        List<InteractionDTO> listInteractions = MyFunctions.getInteractions.apply(MyFunctions.getPactFiles.apply(MyFunctions.getFolder.apply(getServerConfig().getPactFolderPath()),
+                MyFunctions.isDirAndReadable),MyFunctions.isFileAndReadable);
 
     }
 

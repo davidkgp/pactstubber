@@ -11,7 +11,6 @@ import javax.net.ssl.TrustManagerFactory;
 import java.security.KeyStore;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class StubberHttpServer extends StubberServerAbstract {
 

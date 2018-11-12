@@ -1,23 +1,30 @@
 package com.pact.stubber;
 
+import com.pact.parse.dto.InteractionDTO;
+import com.pact.parse.implementation.PactParse;
 import com.pact.stubber.config.SSLData;
 import com.pact.stubber.interfaces.TriFunction;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
-
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 public class MyFunctions {
@@ -110,4 +117,63 @@ public class MyFunctions {
 
         return sslContext;
     };
+
+
+    public static Function<String, File> getFolder = str-> new File(str);
+
+    public static Predicate<File> isDirAndReadable = file->file.exists()&&file.isDirectory()&&file.canRead();
+
+    public static Predicate<File> isFileAndReadable = file-> file.exists() && file.isFile() && !file.isDirectory() && file.canRead();
+
+    public static BiFunction<DirectoryStream<Path>,Predicate,List<File>> convertStreamToList = (stream,predicate)->{
+        List<File> pactFiles = null;
+
+        Iterator<Path> streamIterator = stream.iterator();
+
+        while(streamIterator.hasNext()){
+            Path path = streamIterator.next();
+
+            if(predicate.test(path.toFile())){
+                if(pactFiles==null){
+                    pactFiles = new ArrayList();
+                }
+                pactFiles.add(path.toFile());
+            }else{
+                System.out.println(path.toFile().getPath() +"is not a file or not accessible");
+            }
+
+        }
+
+        return pactFiles;
+
+
+
+    };
+
+    public static BiFunction<File,Predicate<File>,List<File>> getPactFiles = (pactFolder,predicate)->{
+        List<File> pactFiles = null;
+        if(predicate.test(pactFolder)){
+
+            try {
+                pactFiles = convertStreamToList.apply(Files.newDirectoryStream(pactFolder.toPath(),path -> path.toString().endsWith(".json")),isFileAndReadable);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return pactFiles;
+    };
+
+    public static Function<File,InteractionDTO> parsePact = file->{
+
+        PactParse parse = new PactParse();
+        return parse.getInteractions(parse.getJsonObj(file));
+
+    };
+
+    public static BiFunction<List<File>,Predicate<File>,List<InteractionDTO>> getInteractions = (files,predicate)->{
+        return files.stream().filter(predicate).map(parsePact).collect(Collectors.toList());
+    };
+
+
 }
