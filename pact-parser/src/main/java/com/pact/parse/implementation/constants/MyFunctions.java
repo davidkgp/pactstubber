@@ -90,9 +90,8 @@ public class MyFunctions {
 
     public static Function<JSONObject,Interaction<JSONObject>> convertInteractions = json->{
         InteractionParse parse = new InteractionParse();
-        return new Interaction<JSONObject>(parse.getStatus(json)
-                ,new RequestData<JSONObject>(Optional.ofNullable(parse.getBodyRequest(json)),parse.getUrl(json),parse.getHeadersRequest(json),parse.getMethod(json))
-                ,new ResponseData<JSONObject>(Optional.ofNullable(parse.getBodyResponse(json)),parse.getHeadersResponse(json)));
+        return new Interaction<JSONObject>(new RequestData<JSONObject>(Optional.ofNullable(parse.getBodyRequest(json)),parse.getUrl(json),parse.getHeadersRequest(json),parse.getMethod(json))
+                ,new ResponseData<JSONObject>(parse.getStatus(json),Optional.ofNullable(parse.getBodyResponse(json)),parse.getHeadersResponse(json)));
     };
 
     public static Function<JSONArray,InteractionDTO<JSONObject>> convertObj = (array)->{

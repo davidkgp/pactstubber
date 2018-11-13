@@ -30,6 +30,31 @@
           }
         }
       }
+    },
+    {
+      "description": "student interaction",
+      "request": {
+        "method": "GET",
+        "path": "/myapi/student/23",
+        "headers": {
+          "Content-Type": "application/json",
+          "charset": "UTF-8"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "firstName": "Sheldon",
+          "lastName": "Cooper",
+          "address": {
+            "addressLine1": "Poortwachter",
+            "addressLine2": "Rigi"
+          }
+        }
+      }
     }
   ],
   "metadata": {

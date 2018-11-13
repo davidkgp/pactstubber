@@ -11,6 +11,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ResponseData<J> {
 
+    private int status;
+
     private Optional<J> body;
 
     private HeaderObj header;

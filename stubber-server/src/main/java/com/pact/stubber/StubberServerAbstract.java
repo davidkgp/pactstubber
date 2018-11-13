@@ -1,6 +1,8 @@
 package com.pact.stubber;
 
 import com.pact.parse.dto.InteractionDTO;
+import com.pact.parse.dto.RequestData;
+import com.pact.parse.dto.ResponseData;
 import com.pact.stubber.config.SSLData;
 import com.pact.stubber.config.ServerConfig;
 import com.pact.stubber.exceptions.StubberServerException;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,13 +68,17 @@ public abstract class StubberServerAbstract implements IServer {
                 this.server = HttpServer.create(new InetSocketAddress(getServerConfig().getPort()), 0);
             }
 
-            this.server.createContext("/", new MyPactHandler());
+            MyPactHandler pactHandler = new MyPactHandler();
+
+            this.server.createContext("/", pactHandler);
             if (getServerConfig().getExecutor() != null) {
                 this.server.setExecutor(getServerConfig().getExecutor());
             } else {
                 this.server.setExecutor(Executors.newCachedThreadPool());
             }// creates a default executor
             this.server.start();
+
+            pactHandler.setInteractions(loadPacts(getServerConfig().getPactFolderPath()));
         } catch (IOException e) {
             e.printStackTrace();
             throw new StubberServerException(e.getMessage());
@@ -88,7 +95,7 @@ public abstract class StubberServerAbstract implements IServer {
 
     }*/
 
-    @Override
+    /*@Override
     public void loadPacts() throws StubberServerException {
         List<InteractionDTO> listInteractions = MyFunctions.getInteractions
                 .apply(MyFunctions.getPactFiles
@@ -96,16 +103,16 @@ public abstract class StubberServerAbstract implements IServer {
                         (getServerConfig().getPactFolderPath()))
                 .apply(MyFunctions.isFileAndReadable))
                 .apply(MyFunctions.isFileAndReadable);
-    }
+    }*/
 
     //@Override
-    public List<InteractionDTO> loadPacts(String folder) throws StubberServerException {
-        return MyFunctions.getInteractions
+    public Map<RequestData, ResponseData> loadPacts(String folder) throws StubberServerException {
+        return MyFunctions.convertToMap.apply(MyFunctions.getInteractions
                 .apply(MyFunctions.getPactFiles
                         .apply(MyFunctions.getFolder.apply
                                 (folder))
                         .apply(MyFunctions.isDirAndReadable))
-                .apply(MyFunctions.isFileAndReadable);
+                .apply(MyFunctions.isFileAndReadable));
     }
 
     public abstract SSLData getSSLData();

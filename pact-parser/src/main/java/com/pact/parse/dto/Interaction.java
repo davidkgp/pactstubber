@@ -9,8 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 public class Interaction<J> {
 
-    private int status;
-
     private RequestData<J> requestBodyData;
 
     private ResponseData<J> responseBodyData;

@@ -1,14 +1,18 @@
 package com.pact.stubber;
 
-import com.pact.parse.dto.InteractionDTO;
+import com.pact.parse.dto.*;
 import com.pact.parse.implementation.PactParse;
 import com.pact.stubber.config.SSLData;
 import com.pact.stubber.interfaces.TriFunction;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import org.json.JSONObject;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,14 +21,11 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 
 public class MyFunctions {
@@ -117,6 +118,10 @@ public class MyFunctions {
 
         return sslContext;
     };
+
+    public static Predicate<List> listNotEmpty = list->list!=null && !list.isEmpty();
+
+    public static Predicate<Map> mapNotEmpty = map->map!=null && !map.isEmpty();
 
 
     public static Function<String, File> getFolder = str-> new File(str);
@@ -212,8 +217,59 @@ public class MyFunctions {
     };*/
 
     public static Function<List<File>,Function<Predicate<File>,List<InteractionDTO>>> getInteractions = files->predicate->{
-        return files.stream().filter(predicate).map(parsePact).collect(Collectors.toList());
+        return files!=null && !files.isEmpty()?files.stream().filter(predicate).map(parsePact).collect(toList()):null;
     };
 
+    public static Function<List<InteractionDTO>, Map<RequestData, ResponseData>> convertToMap = list->{
+
+        return list!=null && !list.isEmpty()?list.stream().map(i->i.getInteractions()).flatMap(i->((List<Interaction>)i).stream()).collect(Collectors.toMap(i->i.getRequestBodyData(), i->i.getResponseBodyData())):null;
+    };
+
+
+    public static Function<Headers, HeaderObj> convertHeaders = headers -> {
+        return new HeaderObj(headers.entrySet().stream().collect(Collectors.toMap(b->b.getKey(),b->b.getValue())));
+    };
+
+    public static Function<InputStream,JSONObject> convertBody = in->{
+        JSONObject jsonObj = null;
+        StringBuilder body = new StringBuilder();
+        try (InputStreamReader reader = new InputStreamReader(in, Charset.defaultCharset())) {
+            char[] buffer = new char[256];
+            int read;
+            while ((read = reader.read(buffer)) != -1) {
+                body.append(buffer, 0, read);
+            }
+            jsonObj = body.length()!=0? new JSONObject(body.toString()):null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return jsonObj;
+    };
+
+
+    public static Function<HttpExchange,RequestData> convertIncomingRequest = httpExchange -> {
+
+        return new RequestData(Optional.ofNullable(convertBody.apply(httpExchange.getRequestBody())),httpExchange.getRequestURI().getPath(),convertHeaders.apply(httpExchange.getRequestHeaders()),httpExchange.getRequestMethod());
+
+    };
+    public static BiConsumer<ResponseData,HttpExchange> formResponse=(response,httpExchange)->{
+
+        try {
+            response.getHeader().getMaps().entrySet().forEach(entry->httpExchange.getResponseHeaders().put(entry.getKey(),entry.getValue()));
+            String body = (String) response.getBody().map(o->o.toString()).orElse("");
+            httpExchange.sendResponseHeaders(response.getStatus(),body.length());
+            if(body.trim().length()>0){
+                try (OutputStream out = httpExchange.getResponseBody()) {
+                    out.write(body.getBytes(Charset.defaultCharset()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+            httpExchange.close();
+        }
+
+    };
 
 }
