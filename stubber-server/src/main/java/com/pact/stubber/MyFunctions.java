@@ -5,6 +5,7 @@ import com.pact.parse.dto.payload.JSONObjEx;
 import com.pact.parse.implementation.PactParse;
 import com.pact.stubber.config.SSLData;
 import com.pact.stubber.interfaces.TriFunction;
+import com.pact.stubber.util.ListUtils;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.json.JSONObject;
@@ -226,6 +227,14 @@ public class MyFunctions {
 
         return list!=null && !list.isEmpty()?list.stream().map(i->i.getInteractions()).flatMap(i->((List<Interaction>)i).stream()).collect(Collectors.toMap(i->i.getRequestBodyData(), i->i.getResponseBodyData())):null;
     };
+
+
+    /*public static Function<List<InteractionDTO>, Map<RequestData, ResponseData>> convertToMap = list->{
+
+        Function<InteractionDTO,List<Interaction>> funcion1 = i->i.getInteractions();
+
+        return list!=null && !list.isEmpty()? ListUtils.map(funcion1).andThen(ListUtils.flatMap(list))apply(list) :null;
+    };*/
 
 
     public static Function<Headers, HeaderObj> convertHeaders = headers -> {
