@@ -1,6 +1,7 @@
 package com.pact.stubber;
 
 import com.pact.parse.dto.*;
+import com.pact.parse.dto.payload.JSONObjEx;
 import com.pact.parse.implementation.PactParse;
 import com.pact.stubber.config.SSLData;
 import com.pact.stubber.interfaces.TriFunction;
@@ -142,6 +143,7 @@ public class MyFunctions {
                 if(pactFiles==null){
                     pactFiles = new ArrayList();
                 }
+                System.out.println(path.toFile().getPath());
                 pactFiles.add(path.toFile());
             }else{
                 System.out.println(path.toFile().getPath() +"is not a file or not accessible");
@@ -227,10 +229,10 @@ public class MyFunctions {
 
 
     public static Function<Headers, HeaderObj> convertHeaders = headers -> {
-        return new HeaderObj(headers.entrySet().stream().collect(Collectors.toMap(b->b.getKey(),b->b.getValue())));
+        return new HeaderObj(headers.entrySet().stream().collect(Collectors.toMap(b->b.getKey().toUpperCase(),b->b.getValue())));
     };
 
-    public static Function<InputStream,JSONObject> convertBody = in->{
+    /*public static Function<InputStream,JSONObject> convertBody = in->{
         JSONObject jsonObj = null;
         StringBuilder body = new StringBuilder();
         try (InputStreamReader reader = new InputStreamReader(in, Charset.defaultCharset())) {
@@ -240,6 +242,23 @@ public class MyFunctions {
                 body.append(buffer, 0, read);
             }
             jsonObj = body.length()!=0? new JSONObject(body.toString()):null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return jsonObj;
+    };*/
+
+    public static Function<InputStream, JSONObjEx> convertBody = in->{
+        JSONObjEx jsonObj = null;
+        StringBuilder body = new StringBuilder();
+        try (InputStreamReader reader = new InputStreamReader(in, Charset.defaultCharset())) {
+            char[] buffer = new char[256];
+            int read;
+            while ((read = reader.read(buffer)) != -1) {
+                body.append(buffer, 0, read);
+            }
+            jsonObj = body.length()!=0? new JSONObjEx(body.toString()):null;
         } catch (IOException e) {
             e.printStackTrace();
         }

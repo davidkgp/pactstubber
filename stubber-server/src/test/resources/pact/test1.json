@@ -55,6 +55,38 @@
           }
         }
       }
+    },
+    {
+      "description": "student interaction post",
+      "request": {
+        "method": "POST",
+        "path": "/myapi/student/11",
+        "headers": {
+          "Content-Type": "application/json",
+          "charset": "UTF-8"
+        },"body": {
+          "firstName": "Sheldon",
+          "lastName": "Cooper",
+          "address": {
+            "addressLine1": "Poortwachter",
+            "addressLine2": "Rigi"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "firstName": "Sheldon",
+          "lastName": "Cooper",
+          "address": {
+            "addressLine1": "Poortwachter",
+            "addressLine2": "Rigi"
+          }
+        }
+      }
     }
   ],
   "metadata": {

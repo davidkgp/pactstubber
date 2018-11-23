@@ -22,8 +22,4 @@ public class Trigger {
 
 
 }
-@Getter
-@AllArgsConstructor
-class MyClass{
-    private List<String> list;
-}
+

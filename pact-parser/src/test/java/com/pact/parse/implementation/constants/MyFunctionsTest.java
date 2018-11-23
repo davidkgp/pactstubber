@@ -2,8 +2,8 @@ package com.pact.parse.implementation.constants;
 
 import com.pact.parse.dto.HeaderObj;
 import com.pact.parse.dto.InteractionDTO;
+import com.pact.parse.dto.payload.JSONObjEx;
 import com.pact.parse.implementation.PactParse;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,16 +17,16 @@ public class MyFunctionsTest {
 
     @Test
     public void testConvertMap(){
-        JSONObject obj = new JSONObject("{\n" +
+        JSONObjEx obj = new JSONObjEx("{\n" +
                 "        \"Content-Type\": \"application/json\",\n" +
                 "        \"Long-Type\": \"application/json\",\n" +
                 "        \"Test-Type\": \"application/json\"\n" +
                 "    }");
         Map actual = MyFunctions.convertMap.apply(obj);
         Map expected = new HashMap<String, List>(){{
-           put("Content-Type", Collections.singletonList("application/json"));
-           put("Long-Type", Collections.singletonList("application/json"));
-           put("Test-Type", Collections.singletonList("application/json"));
+           put("Content-Type".toUpperCase(), Collections.singletonList("application/json"));
+           put("Long-Type".toUpperCase(), Collections.singletonList("application/json"));
+           put("Test-Type".toUpperCase(), Collections.singletonList("application/json"));
 
 
         }};
@@ -35,16 +35,16 @@ public class MyFunctionsTest {
 
     @Test
     public void testConvertMap1(){
-        JSONObject obj = new JSONObject("{\n" +
+        JSONObjEx obj = new JSONObjEx("{\n" +
                 "        \"Content-Type\": \"application/json;test/xhtml\",\n" +
                 "        \"Long-Type\": \"application/json\",\n" +
                 "        \"Test-Type\": \"application/json;ter/iou\"\n" +
                 "    }");
         Map actual = MyFunctions.convertMap.apply(obj);
         Map expected = new HashMap<String, List>(){{
-            put("Content-Type", Collections.singletonList("application/json;test/xhtml"));
-            put("Test-Type", Collections.singletonList("application/json;ter/iou"));
-            put("Long-Type", Collections.singletonList("application/json"));
+            put("Content-Type".toUpperCase(), Collections.singletonList("application/json;test/xhtml"));
+            put("Test-Type".toUpperCase(), Collections.singletonList("application/json;ter/iou"));
+            put("Long-Type".toUpperCase(), Collections.singletonList("application/json"));
 
 
         }};
@@ -53,14 +53,14 @@ public class MyFunctionsTest {
 
     @Test
     public void testConvertMap2(){
-        JSONObject obj = new JSONObject("{}");
+        JSONObjEx obj = new JSONObjEx("{}");
         Map actual = MyFunctions.convertMap.apply(obj);
         Assert.assertTrue(actual.isEmpty());
     }
 
     @Test
     public void testGetRequestHeader(){
-        JSONObject json = new JSONObject("{\"request\": {\n" +
+        JSONObjEx json = new JSONObjEx("{\"request\": {\n" +
                 "        \"method\": \"GET\",\n" +
                 "        \"path\": \"/data/name\",\n" +
                 "        \"headers\": {\n" +
@@ -69,7 +69,7 @@ public class MyFunctionsTest {
                 "      }}");
         HeaderObj actual = MyFunctions.getRequestHeader.apply(json);
         HeaderObj expected = new HeaderObj(new HashMap<String,List>(){{
-            put("Content-Type", Collections.singletonList("application/json"));
+            put("Content-Type".toUpperCase(), Collections.singletonList("application/json"));
         }});
         Assert.assertEquals(actual.getMaps(),expected.getMaps());
 
@@ -77,7 +77,7 @@ public class MyFunctionsTest {
 
     @Test
     public void testGetRequestHeader1(){
-        JSONObject json = new JSONObject("{\"request\": {\n" +
+        JSONObjEx json = new JSONObjEx("{\"request\": {\n" +
                 "        \"method\": \"GET\",\n" +
                 "        \"path\": \"/data/name\"\n" +
                 "      }}");
@@ -89,11 +89,11 @@ public class MyFunctionsTest {
 
     @Test
     public void testGetRequestBody(){
-        JSONObject json = new JSONObject("{\"request\": {\n" +
+        JSONObjEx json = new JSONObjEx("{\"request\": {\n" +
                 "        \"method\": \"GET\",\n" +
                 "        \"path\": \"/data/name\"\n" +
                 "      }}");
-        JSONObject actual = MyFunctions.getRequestBody.apply(json);
+        JSONObjEx actual = MyFunctions.getRequestBody.apply(json);
 
         Assert.assertNull(actual);
 
@@ -101,11 +101,11 @@ public class MyFunctionsTest {
 
     /*@Test
     public void testRequestBody(){
-        JSONObject json = new JSONObject("{\"request\": {\n" +
+        JSONObjEx json = new JSONObjEx("{\"request\": {\n" +
                 "        \"method\": \"GET\",\n" +
                 "        \"path\": \"/data/name\"\n" +
                 "      }}");
-        JSONObject actual = new JSONObject("{\"request\": {\n" +
+        JSONObjEx actual = new JSONObjEx("{\"request\": {\n" +
                 "        \"method\": \"GET\",\n" +
                 "        \"path\": \"/data/name\"\n" +
                 "      }}");
